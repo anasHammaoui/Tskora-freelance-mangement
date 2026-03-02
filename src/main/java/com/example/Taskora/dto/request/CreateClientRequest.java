@@ -18,6 +18,8 @@ public class CreateClientRequest {
 
     private String company;
 
+    private String address;
+
     @NotNull(message = "User ID is required")
     private Long userId;
 }

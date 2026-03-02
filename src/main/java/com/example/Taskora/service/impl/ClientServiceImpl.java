@@ -49,6 +49,19 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public Page<ClientResponse> searchClients(String name, Pageable pageable) {
+        return clientRepository.findByNameContainingIgnoreCase(name, pageable)
+                .map(clientMapper::toResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<ClientResponse> getClientsByUser(Long userId, Pageable pageable) {
+        return clientRepository.findByUserId(userId, pageable).map(clientMapper::toResponse);
+    }
+
+    @Override
     public ClientResponse updateClient(Long id, CreateClientRequest request) {
         Client client = clientRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Client", id));

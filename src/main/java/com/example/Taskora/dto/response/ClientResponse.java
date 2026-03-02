@@ -10,6 +10,7 @@ public class ClientResponse {
     private String email;
     private String phone;
     private String company;
+    private String address;
     private LocalDateTime createdAt;
     private Long userId;
     private String userFullName;

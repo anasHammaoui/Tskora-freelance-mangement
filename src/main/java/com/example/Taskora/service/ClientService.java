@@ -9,6 +9,8 @@ public interface ClientService {
     ClientResponse createClient(CreateClientRequest request);
     ClientResponse getClientById(Long id);
     Page<ClientResponse> getAllClients(Pageable pageable);
+    Page<ClientResponse> searchClients(String name, Pageable pageable);
+    Page<ClientResponse> getClientsByUser(Long userId, Pageable pageable);
     ClientResponse updateClient(Long id, CreateClientRequest request);
     void deleteClient(Long id);
 }
