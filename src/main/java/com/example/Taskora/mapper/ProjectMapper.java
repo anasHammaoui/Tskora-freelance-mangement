@@ -10,6 +10,8 @@ public interface ProjectMapper {
 
     @Mapping(target = "client", ignore = true)
     @Mapping(target = "user", ignore = true)
+    @Mapping(target = "tasks", ignore = true)
+    @Mapping(target = "invoices", ignore = true)
     Project toEntity(CreateProjectRequest request);
 
     @Mapping(source = "client.id", target = "clientId")
@@ -21,5 +23,7 @@ public interface ProjectMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "client", ignore = true)
     @Mapping(target = "user", ignore = true)
+    @Mapping(target = "tasks", ignore = true)
+    @Mapping(target = "invoices", ignore = true)
     void updateEntityFromRequest(CreateProjectRequest request, @MappingTarget Project project);
 }

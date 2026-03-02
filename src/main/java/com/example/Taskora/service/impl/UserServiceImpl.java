@@ -2,7 +2,9 @@ package com.example.Taskora.service.impl;
 
 import com.example.Taskora.dto.request.CreateUserRequest;
 import com.example.Taskora.dto.response.UserResponse;
+import com.example.Taskora.entity.Role;
 import com.example.Taskora.entity.User;
+import com.example.Taskora.entity.UserStatus;
 import com.example.Taskora.exception.DuplicateResourceException;
 import com.example.Taskora.exception.ResourceNotFoundException;
 import com.example.Taskora.mapper.UserMapper;
@@ -11,6 +13,7 @@ import com.example.Taskora.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +24,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserResponse createUser(CreateUserRequest request) {
@@ -28,6 +32,13 @@ public class UserServiceImpl implements UserService {
             throw new DuplicateResourceException("User", "email", request.getEmail());
         }
         User user = userMapper.toEntity(request);
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        if (user.getRole() == null) {
+            user.setRole(Role.ROLE_FREELANCER);
+        }
+        if (user.getStatus() == null) {
+            user.setStatus(UserStatus.ACTIVE);
+        }
         User saved = userRepository.save(user);
         return userMapper.toResponse(saved);
     }
@@ -54,6 +65,9 @@ public class UserServiceImpl implements UserService {
             throw new DuplicateResourceException("User", "email", request.getEmail());
         }
         userMapper.updateEntityFromRequest(request, user);
+        if (request.getPassword() != null && !request.getPassword().isBlank()) {
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
+        }
         User saved = userRepository.save(user);
         return userMapper.toResponse(saved);
     }

@@ -1,5 +1,6 @@
 package com.example.Taskora.dto.request;
 
+import com.example.Taskora.entity.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
@@ -16,4 +17,6 @@ public class CreateUserRequest {
 
     @NotBlank(message = "Password is required")
     private String password;
+
+    private Role role;
 }
