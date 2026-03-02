@@ -58,6 +58,26 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public Page<UserResponse> getFreelancers(Pageable pageable) {
+        return userRepository.findByRole(Role.ROLE_FREELANCER, pageable).map(userMapper::toResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<UserResponse> searchFreelancers(String name, Pageable pageable) {
+        return userRepository.findByRoleAndFullNameContainingIgnoreCase(Role.ROLE_FREELANCER, name, pageable)
+                .map(userMapper::toResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<UserResponse> getFreelancersByStatus(UserStatus status, Pageable pageable) {
+        return userRepository.findByRoleAndStatus(Role.ROLE_FREELANCER, status, pageable)
+                .map(userMapper::toResponse);
+    }
+
+    @Override
     public UserResponse updateUser(Long id, CreateUserRequest request) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User", id));
@@ -68,6 +88,24 @@ public class UserServiceImpl implements UserService {
         if (request.getPassword() != null && !request.getPassword().isBlank()) {
             user.setPassword(passwordEncoder.encode(request.getPassword()));
         }
+        User saved = userRepository.save(user);
+        return userMapper.toResponse(saved);
+    }
+
+    @Override
+    public UserResponse banUser(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User", id));
+        user.setStatus(UserStatus.BANNED);
+        User saved = userRepository.save(user);
+        return userMapper.toResponse(saved);
+    }
+
+    @Override
+    public UserResponse activateUser(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User", id));
+        user.setStatus(UserStatus.ACTIVE);
         User saved = userRepository.save(user);
         return userMapper.toResponse(saved);
     }
