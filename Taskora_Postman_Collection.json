@@ -1,6 +1,6 @@
 {
   "info": {
-    "_postman_id": "taskora-collection-v1",
+    "_postman_id": "taskora-collection-v2",
     "name": "Taskora API",
     "description": "Complete REST API collection for Taskora backend",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
@@ -27,7 +27,7 @@
             "url": { "raw": "{{baseUrl}}/users", "host": ["{{baseUrl}}"], "path": ["users"] },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"fullName\": \"Ayoub Hammaoui\",\n  \"email\": \"ayoub.hammaoui@example.com\",\n  \"password\": \"securePassword123\"\n}"
+              "raw": "{\n  \"fullName\": \"Ayoub Hammaoui\",\n  \"email\": \"ayoub.hammaoui@example.com\",\n  \"password\": \"securePassword123\",\n  \"role\": \"FREELANCER\"\n}"
             }
           }
         },
@@ -54,6 +54,24 @@
           }
         },
         {
+          "name": "Get All Freelancers",
+          "request": {
+            "method": "GET",
+            "description": "Get all freelancers, optionally filtered by status (ACTIVE, BANNED) or searched by name. Admin only.",
+            "url": {
+              "raw": "{{baseUrl}}/users/freelancers?page=0&size=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "freelancers"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "10" },
+                { "key": "status", "value": "ACTIVE", "disabled": true },
+                { "key": "search", "value": "Ayoub", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
           "name": "Update User",
           "request": {
             "method": "PUT",
@@ -61,8 +79,24 @@
             "url": { "raw": "{{baseUrl}}/users/1", "host": ["{{baseUrl}}"], "path": ["users", "1"] },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"fullName\": \"Ayoub Hammaoui Updated\",\n  \"email\": \"ayoub.updated@example.com\",\n  \"password\": \"newSecurePassword456\"\n}"
+              "raw": "{\n  \"fullName\": \"Ayoub Hammaoui Updated\",\n  \"email\": \"ayoub.updated@example.com\",\n  \"password\": \"newSecurePassword456\",\n  \"role\": \"FREELANCER\"\n}"
             }
+          }
+        },
+        {
+          "name": "Ban User",
+          "request": {
+            "method": "PATCH",
+            "description": "Ban a user account. Admin only.",
+            "url": { "raw": "{{baseUrl}}/users/1/ban", "host": ["{{baseUrl}}"], "path": ["users", "1", "ban"] }
+          }
+        },
+        {
+          "name": "Activate User",
+          "request": {
+            "method": "PATCH",
+            "description": "Activate or reactivate a user account. Admin only.",
+            "url": { "raw": "{{baseUrl}}/users/1/activate", "host": ["{{baseUrl}}"], "path": ["users", "1", "activate"] }
           }
         },
         {
@@ -100,10 +134,28 @@
           "name": "Get All Clients",
           "request": {
             "method": "GET",
+            "description": "Get all clients with optional search by name.",
             "url": {
               "raw": "{{baseUrl}}/clients?page=0&size=10",
               "host": ["{{baseUrl}}"],
               "path": ["clients"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "10" },
+                { "key": "search", "value": "TechCorp", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Clients By User",
+          "request": {
+            "method": "GET",
+            "description": "Get all clients belonging to a specific user.",
+            "url": {
+              "raw": "{{baseUrl}}/clients/user/1?page=0&size=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["clients", "user", "1"],
               "query": [
                 { "key": "page", "value": "0" },
                 { "key": "size", "value": "10" }
@@ -158,13 +210,32 @@
           "name": "Get All Projects",
           "request": {
             "method": "GET",
+            "description": "Get all projects, optionally filtered by status (EN_COURS, TERMINE, EN_ATTENTE, ANNULE).",
             "url": {
               "raw": "{{baseUrl}}/projects?page=0&size=10",
               "host": ["{{baseUrl}}"],
               "path": ["projects"],
               "query": [
                 { "key": "page", "value": "0" },
-                { "key": "size", "value": "10" }
+                { "key": "size", "value": "10" },
+                { "key": "status", "value": "EN_COURS", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Projects By User",
+          "request": {
+            "method": "GET",
+            "description": "Get all projects for a specific user, optionally filtered by status.",
+            "url": {
+              "raw": "{{baseUrl}}/projects/user/1?page=0&size=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects", "user", "1"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "10" },
+                { "key": "status", "value": "EN_COURS", "disabled": true }
               ]
             }
           }
@@ -182,10 +253,219 @@
           }
         },
         {
+          "name": "Mark Project As Complete",
+          "request": {
+            "method": "PATCH",
+            "description": "Mark a project as complete.",
+            "url": { "raw": "{{baseUrl}}/projects/1/complete", "host": ["{{baseUrl}}"], "path": ["projects", "1", "complete"] }
+          }
+        },
+        {
           "name": "Delete Project",
           "request": {
             "method": "DELETE",
             "url": { "raw": "{{baseUrl}}/projects/1", "host": ["{{baseUrl}}"], "path": ["projects", "1"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tasks",
+      "item": [
+        {
+          "name": "Create Task",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/tasks", "host": ["{{baseUrl}}"], "path": ["tasks"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Design homepage mockup\",\n  \"description\": \"Create wireframes and high-fidelity mockup for the homepage.\",\n  \"dueDate\": \"2026-03-15\",\n  \"status\": \"A_FAIRE\",\n  \"projectId\": 1,\n  \"userId\": 1\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Task By ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/tasks/1", "host": ["{{baseUrl}}"], "path": ["tasks", "1"] }
+          }
+        },
+        {
+          "name": "Get Tasks By Project",
+          "request": {
+            "method": "GET",
+            "description": "Get all tasks for a project, optionally filtered by status (A_FAIRE, EN_COURS, TERMINE).",
+            "url": {
+              "raw": "{{baseUrl}}/tasks/project/1?page=0&size=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["tasks", "project", "1"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "10" },
+                { "key": "status", "value": "A_FAIRE", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Tasks By User",
+          "request": {
+            "method": "GET",
+            "description": "Get all tasks assigned to a specific user.",
+            "url": {
+              "raw": "{{baseUrl}}/tasks/user/1?page=0&size=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["tasks", "user", "1"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Task",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/tasks/1", "host": ["{{baseUrl}}"], "path": ["tasks", "1"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Design homepage mockup - Revised\",\n  \"description\": \"Updated wireframes based on client feedback.\",\n  \"dueDate\": \"2026-03-20\",\n  \"status\": \"EN_COURS\",\n  \"projectId\": 1,\n  \"userId\": 1\n}"
+            }
+          }
+        },
+        {
+          "name": "Mark Task As Done",
+          "request": {
+            "method": "PATCH",
+            "description": "Mark a task as done.",
+            "url": { "raw": "{{baseUrl}}/tasks/1/done", "host": ["{{baseUrl}}"], "path": ["tasks", "1", "done"] }
+          }
+        },
+        {
+          "name": "Delete Task",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/tasks/1", "host": ["{{baseUrl}}"], "path": ["tasks", "1"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Invoices",
+      "item": [
+        {
+          "name": "Create Invoice",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "description": "Create a new invoice with automatic number generation and HT/TVA/TTC calculation.",
+            "url": { "raw": "{{baseUrl}}/invoices", "host": ["{{baseUrl}}"], "path": ["invoices"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"issueDate\": \"2026-03-04\",\n  \"dueDate\": \"2026-04-04\",\n  \"taxRate\": 20.00,\n  \"projectId\": 1,\n  \"userId\": 1,\n  \"lines\": [\n    {\n      \"description\": \"UI/UX Design - Homepage & Landing Pages\",\n      \"quantity\": 1,\n      \"unitPrice\": 3500.00\n    },\n    {\n      \"description\": \"Frontend Development\",\n      \"quantity\": 2,\n      \"unitPrice\": 2500.00\n    }\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Invoice By ID",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/invoices/1", "host": ["{{baseUrl}}"], "path": ["invoices", "1"] }
+          }
+        },
+        {
+          "name": "Get All Invoices",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/invoices?page=0&size=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["invoices"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Invoices By User",
+          "request": {
+            "method": "GET",
+            "description": "Get invoices for a specific user, optionally filtered by status (EN_ATTENTE, PAYEE, ANNULEE).",
+            "url": {
+              "raw": "{{baseUrl}}/invoices/user/1?page=0&size=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["invoices", "user", "1"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "10" },
+                { "key": "status", "value": "EN_ATTENTE", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Invoices By Project",
+          "request": {
+            "method": "GET",
+            "description": "Get all invoices for a specific project.",
+            "url": {
+              "raw": "{{baseUrl}}/invoices/project/1?page=0&size=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["invoices", "project", "1"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Mark Invoice As Paid",
+          "request": {
+            "method": "PATCH",
+            "description": "Mark an invoice as paid.",
+            "url": { "raw": "{{baseUrl}}/invoices/1/pay", "host": ["{{baseUrl}}"], "path": ["invoices", "1", "pay"] }
+          }
+        },
+        {
+          "name": "Cancel Invoice",
+          "request": {
+            "method": "PATCH",
+            "description": "Cancel an invoice.",
+            "url": { "raw": "{{baseUrl}}/invoices/1/cancel", "host": ["{{baseUrl}}"], "path": ["invoices", "1", "cancel"] }
+          }
+        },
+        {
+          "name": "Delete Invoice",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/invoices/1", "host": ["{{baseUrl}}"], "path": ["invoices", "1"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "item": [
+        {
+          "name": "Get Freelancer Dashboard",
+          "request": {
+            "method": "GET",
+            "description": "Get freelancer dashboard metrics: total clients, active projects, pending invoices, and monthly revenue for the last 6 months.",
+            "url": { "raw": "{{baseUrl}}/dashboard/freelancer/1", "host": ["{{baseUrl}}"], "path": ["dashboard", "freelancer", "1"] }
+          }
+        },
+        {
+          "name": "Get Admin Dashboard",
+          "request": {
+            "method": "GET",
+            "description": "Get admin dashboard metrics: freelancer stats, project stats, and platform revenue for the last 12 months.",
+            "url": { "raw": "{{baseUrl}}/dashboard/admin", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin"] }
           }
         }
       ]
