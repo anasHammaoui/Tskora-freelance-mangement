@@ -1,6 +1,6 @@
 {
   "info": {
-    "_postman_id": "taskora-collection-v2",
+    "_postman_id": "taskora-collection-v3",
     "name": "Taskora API",
     "description": "Complete REST API collection for Taskora backend",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
@@ -13,7 +13,12 @@
     ]
   },
   "variable": [
-    { "key": "baseUrl", "value": "http://localhost:8080/api", "type": "string" }
+    { "key": "baseUrl",    "value": "http://localhost:8080/api", "type": "string" },
+    { "key": "userId",     "value": "1", "type": "string" },
+    { "key": "clientId",   "value": "1", "type": "string" },
+    { "key": "projectId",  "value": "1", "type": "string" },
+    { "key": "taskId",     "value": "1", "type": "string" },
+    { "key": "invoiceId",  "value": "1", "type": "string" }
   ],
   "item": [
     {
@@ -27,7 +32,7 @@
             "url": { "raw": "{{baseUrl}}/users", "host": ["{{baseUrl}}"], "path": ["users"] },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"fullName\": \"Ayoub Hammaoui\",\n  \"email\": \"ayoub.hammaoui@example.com\",\n  \"password\": \"securePassword123\",\n  \"role\": \"FREELANCER\"\n}"
+              "raw": "{\n  \"fullName\": \"Ayoub Hammaoui\",\n  \"email\": \"ayoub.hammaoui@example.com\",\n  \"password\": \"securePassword123\",\n  \"role\": \"ROLE_FREELANCER\"\n}"
             }
           }
         },
@@ -35,7 +40,7 @@
           "name": "Get User By ID",
           "request": {
             "method": "GET",
-            "url": { "raw": "{{baseUrl}}/users/1", "host": ["{{baseUrl}}"], "path": ["users", "1"] }
+            "url": { "raw": "{{baseUrl}}/users/{{userId}}", "host": ["{{baseUrl}}"], "path": ["users", "{{userId}}"] }
           }
         },
         {
@@ -76,10 +81,10 @@
           "request": {
             "method": "PUT",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": { "raw": "{{baseUrl}}/users/1", "host": ["{{baseUrl}}"], "path": ["users", "1"] },
+            "url": { "raw": "{{baseUrl}}/users/{{userId}}", "host": ["{{baseUrl}}"], "path": ["users", "{{userId}}"] },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"fullName\": \"Ayoub Hammaoui Updated\",\n  \"email\": \"ayoub.updated@example.com\",\n  \"password\": \"newSecurePassword456\",\n  \"role\": \"FREELANCER\"\n}"
+              "raw": "{\n  \"fullName\": \"Ayoub Hammaoui Updated\",\n  \"email\": \"ayoub.updated@example.com\",\n  \"password\": \"newSecurePassword456\",\n  \"role\": \"ROLE_FREELANCER\"\n}"
             }
           }
         },
@@ -88,7 +93,7 @@
           "request": {
             "method": "PATCH",
             "description": "Ban a user account. Admin only.",
-            "url": { "raw": "{{baseUrl}}/users/1/ban", "host": ["{{baseUrl}}"], "path": ["users", "1", "ban"] }
+            "url": { "raw": "{{baseUrl}}/users/{{userId}}/ban", "host": ["{{baseUrl}}"], "path": ["users", "{{userId}}", "ban"] }
           }
         },
         {
@@ -96,14 +101,14 @@
           "request": {
             "method": "PATCH",
             "description": "Activate or reactivate a user account. Admin only.",
-            "url": { "raw": "{{baseUrl}}/users/1/activate", "host": ["{{baseUrl}}"], "path": ["users", "1", "activate"] }
+            "url": { "raw": "{{baseUrl}}/users/{{userId}}/activate", "host": ["{{baseUrl}}"], "path": ["users", "{{userId}}", "activate"] }
           }
         },
         {
           "name": "Delete User",
           "request": {
             "method": "DELETE",
-            "url": { "raw": "{{baseUrl}}/users/1", "host": ["{{baseUrl}}"], "path": ["users", "1"] }
+            "url": { "raw": "{{baseUrl}}/users/{{userId}}", "host": ["{{baseUrl}}"], "path": ["users", "{{userId}}"] }
           }
         }
       ]
@@ -127,7 +132,7 @@
           "name": "Get Client By ID",
           "request": {
             "method": "GET",
-            "url": { "raw": "{{baseUrl}}/clients/1", "host": ["{{baseUrl}}"], "path": ["clients", "1"] }
+            "url": { "raw": "{{baseUrl}}/clients/{{clientId}}", "host": ["{{baseUrl}}"], "path": ["clients", "{{clientId}}"] }
           }
         },
         {
@@ -153,9 +158,9 @@
             "method": "GET",
             "description": "Get all clients belonging to a specific user.",
             "url": {
-              "raw": "{{baseUrl}}/clients/user/1?page=0&size=10",
+              "raw": "{{baseUrl}}/clients/user/{{userId}}?page=0&size=10",
               "host": ["{{baseUrl}}"],
-              "path": ["clients", "user", "1"],
+              "path": ["clients", "user", "{{userId}}"],
               "query": [
                 { "key": "page", "value": "0" },
                 { "key": "size", "value": "10" }
@@ -168,7 +173,7 @@
           "request": {
             "method": "PUT",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": { "raw": "{{baseUrl}}/clients/1", "host": ["{{baseUrl}}"], "path": ["clients", "1"] },
+            "url": { "raw": "{{baseUrl}}/clients/{{clientId}}", "host": ["{{baseUrl}}"], "path": ["clients", "{{clientId}}"] },
             "body": {
               "mode": "raw",
               "raw": "{\n  \"name\": \"TechCorp Maroc Updated\",\n  \"email\": \"info@techcorp.ma\",\n  \"phone\": \"+212 6 70 98 76 54\",\n  \"company\": \"TechCorp Maroc SA\",\n  \"userId\": 1\n}"
@@ -179,7 +184,7 @@
           "name": "Delete Client",
           "request": {
             "method": "DELETE",
-            "url": { "raw": "{{baseUrl}}/clients/1", "host": ["{{baseUrl}}"], "path": ["clients", "1"] }
+            "url": { "raw": "{{baseUrl}}/clients/{{clientId}}", "host": ["{{baseUrl}}"], "path": ["clients", "{{clientId}}"] }
           }
         }
       ]
@@ -203,7 +208,7 @@
           "name": "Get Project By ID",
           "request": {
             "method": "GET",
-            "url": { "raw": "{{baseUrl}}/projects/1", "host": ["{{baseUrl}}"], "path": ["projects", "1"] }
+            "url": { "raw": "{{baseUrl}}/projects/{{projectId}}", "host": ["{{baseUrl}}"], "path": ["projects", "{{projectId}}"] }
           }
         },
         {
@@ -229,9 +234,9 @@
             "method": "GET",
             "description": "Get all projects for a specific user, optionally filtered by status.",
             "url": {
-              "raw": "{{baseUrl}}/projects/user/1?page=0&size=10",
+              "raw": "{{baseUrl}}/projects/user/{{userId}}?page=0&size=10",
               "host": ["{{baseUrl}}"],
-              "path": ["projects", "user", "1"],
+              "path": ["projects", "user", "{{userId}}"],
               "query": [
                 { "key": "page", "value": "0" },
                 { "key": "size", "value": "10" },
@@ -245,7 +250,7 @@
           "request": {
             "method": "PUT",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": { "raw": "{{baseUrl}}/projects/1", "host": ["{{baseUrl}}"], "path": ["projects", "1"] },
+            "url": { "raw": "{{baseUrl}}/projects/{{projectId}}", "host": ["{{baseUrl}}"], "path": ["projects", "{{projectId}}"] },
             "body": {
               "mode": "raw",
               "raw": "{\n  \"title\": \"E-Commerce Platform Redesign - Phase 2\",\n  \"description\": \"Phase 2: Advanced features including payment gateway and analytics dashboard.\",\n  \"budget\": 22000.00,\n  \"status\": \"TERMINE\",\n  \"startDate\": \"2026-03-01\",\n  \"endDate\": \"2026-09-30\",\n  \"clientId\": 1,\n  \"userId\": 1\n}"
@@ -256,15 +261,15 @@
           "name": "Mark Project As Complete",
           "request": {
             "method": "PATCH",
-            "description": "Mark a project as complete.",
-            "url": { "raw": "{{baseUrl}}/projects/1/complete", "host": ["{{baseUrl}}"], "path": ["projects", "1", "complete"] }
+            "description": "Mark a project as complete (status → TERMINE).",
+            "url": { "raw": "{{baseUrl}}/projects/{{projectId}}/complete", "host": ["{{baseUrl}}"], "path": ["projects", "{{projectId}}", "complete"] }
           }
         },
         {
           "name": "Delete Project",
           "request": {
             "method": "DELETE",
-            "url": { "raw": "{{baseUrl}}/projects/1", "host": ["{{baseUrl}}"], "path": ["projects", "1"] }
+            "url": { "raw": "{{baseUrl}}/projects/{{projectId}}", "host": ["{{baseUrl}}"], "path": ["projects", "{{projectId}}"] }
           }
         }
       ]
@@ -288,18 +293,18 @@
           "name": "Get Task By ID",
           "request": {
             "method": "GET",
-            "url": { "raw": "{{baseUrl}}/tasks/1", "host": ["{{baseUrl}}"], "path": ["tasks", "1"] }
+            "url": { "raw": "{{baseUrl}}/tasks/{{taskId}}", "host": ["{{baseUrl}}"], "path": ["tasks", "{{taskId}}"] }
           }
         },
         {
           "name": "Get Tasks By Project",
           "request": {
             "method": "GET",
-            "description": "Get all tasks for a project, optionally filtered by status (A_FAIRE, EN_COURS, TERMINE).",
+            "description": "Get all tasks for a project, optionally filtered by status (A_FAIRE, TERMINEE).",
             "url": {
-              "raw": "{{baseUrl}}/tasks/project/1?page=0&size=10",
+              "raw": "{{baseUrl}}/tasks/project/{{projectId}}?page=0&size=10",
               "host": ["{{baseUrl}}"],
-              "path": ["tasks", "project", "1"],
+              "path": ["tasks", "project", "{{projectId}}"],
               "query": [
                 { "key": "page", "value": "0" },
                 { "key": "size", "value": "10" },
@@ -314,9 +319,9 @@
             "method": "GET",
             "description": "Get all tasks assigned to a specific user.",
             "url": {
-              "raw": "{{baseUrl}}/tasks/user/1?page=0&size=10",
+              "raw": "{{baseUrl}}/tasks/user/{{userId}}?page=0&size=10",
               "host": ["{{baseUrl}}"],
-              "path": ["tasks", "user", "1"],
+              "path": ["tasks", "user", "{{userId}}"],
               "query": [
                 { "key": "page", "value": "0" },
                 { "key": "size", "value": "10" }
@@ -329,7 +334,7 @@
           "request": {
             "method": "PUT",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": { "raw": "{{baseUrl}}/tasks/1", "host": ["{{baseUrl}}"], "path": ["tasks", "1"] },
+            "url": { "raw": "{{baseUrl}}/tasks/{{taskId}}", "host": ["{{baseUrl}}"], "path": ["tasks", "{{taskId}}"] },
             "body": {
               "mode": "raw",
               "raw": "{\n  \"title\": \"Design homepage mockup - Revised\",\n  \"description\": \"Updated wireframes based on client feedback.\",\n  \"dueDate\": \"2026-03-20\",\n  \"status\": \"EN_COURS\",\n  \"projectId\": 1,\n  \"userId\": 1\n}"
@@ -340,15 +345,15 @@
           "name": "Mark Task As Done",
           "request": {
             "method": "PATCH",
-            "description": "Mark a task as done.",
-            "url": { "raw": "{{baseUrl}}/tasks/1/done", "host": ["{{baseUrl}}"], "path": ["tasks", "1", "done"] }
+            "description": "Mark a task as done (status → TERMINEE).",
+            "url": { "raw": "{{baseUrl}}/tasks/{{taskId}}/done", "host": ["{{baseUrl}}"], "path": ["tasks", "{{taskId}}", "done"] }
           }
         },
         {
           "name": "Delete Task",
           "request": {
             "method": "DELETE",
-            "url": { "raw": "{{baseUrl}}/tasks/1", "host": ["{{baseUrl}}"], "path": ["tasks", "1"] }
+            "url": { "raw": "{{baseUrl}}/tasks/{{taskId}}", "host": ["{{baseUrl}}"], "path": ["tasks", "{{taskId}}"] }
           }
         }
       ]
@@ -373,7 +378,7 @@
           "name": "Get Invoice By ID",
           "request": {
             "method": "GET",
-            "url": { "raw": "{{baseUrl}}/invoices/1", "host": ["{{baseUrl}}"], "path": ["invoices", "1"] }
+            "url": { "raw": "{{baseUrl}}/invoices/{{invoiceId}}", "host": ["{{baseUrl}}"], "path": ["invoices", "{{invoiceId}}"] }
           }
         },
         {
@@ -395,11 +400,11 @@
           "name": "Get Invoices By User",
           "request": {
             "method": "GET",
-            "description": "Get invoices for a specific user, optionally filtered by status (EN_ATTENTE, PAYEE, ANNULEE).",
+            "description": "Get invoices for a specific user. Filter by status: EN_ATTENTE, PAYEE, ANNULEE.",
             "url": {
-              "raw": "{{baseUrl}}/invoices/user/1?page=0&size=10",
+              "raw": "{{baseUrl}}/invoices/user/{{userId}}?page=0&size=10",
               "host": ["{{baseUrl}}"],
-              "path": ["invoices", "user", "1"],
+              "path": ["invoices", "user", "{{userId}}"],
               "query": [
                 { "key": "page", "value": "0" },
                 { "key": "size", "value": "10" },
@@ -414,9 +419,9 @@
             "method": "GET",
             "description": "Get all invoices for a specific project.",
             "url": {
-              "raw": "{{baseUrl}}/invoices/project/1?page=0&size=10",
+              "raw": "{{baseUrl}}/invoices/project/{{projectId}}?page=0&size=10",
               "host": ["{{baseUrl}}"],
-              "path": ["invoices", "project", "1"],
+              "path": ["invoices", "project", "{{projectId}}"],
               "query": [
                 { "key": "page", "value": "0" },
                 { "key": "size", "value": "10" }
@@ -428,23 +433,23 @@
           "name": "Mark Invoice As Paid",
           "request": {
             "method": "PATCH",
-            "description": "Mark an invoice as paid.",
-            "url": { "raw": "{{baseUrl}}/invoices/1/pay", "host": ["{{baseUrl}}"], "path": ["invoices", "1", "pay"] }
+            "description": "Mark an invoice as paid (status → PAYEE). Required for revenue to appear in dashboard.",
+            "url": { "raw": "{{baseUrl}}/invoices/{{invoiceId}}/pay", "host": ["{{baseUrl}}"], "path": ["invoices", "{{invoiceId}}", "pay"] }
           }
         },
         {
           "name": "Cancel Invoice",
           "request": {
             "method": "PATCH",
-            "description": "Cancel an invoice.",
-            "url": { "raw": "{{baseUrl}}/invoices/1/cancel", "host": ["{{baseUrl}}"], "path": ["invoices", "1", "cancel"] }
+            "description": "Cancel an invoice (status → ANNULEE).",
+            "url": { "raw": "{{baseUrl}}/invoices/{{invoiceId}}/cancel", "host": ["{{baseUrl}}"], "path": ["invoices", "{{invoiceId}}", "cancel"] }
           }
         },
         {
           "name": "Delete Invoice",
           "request": {
             "method": "DELETE",
-            "url": { "raw": "{{baseUrl}}/invoices/1", "host": ["{{baseUrl}}"], "path": ["invoices", "1"] }
+            "url": { "raw": "{{baseUrl}}/invoices/{{invoiceId}}", "host": ["{{baseUrl}}"], "path": ["invoices", "{{invoiceId}}"] }
           }
         }
       ]
@@ -456,16 +461,48 @@
           "name": "Get Freelancer Dashboard",
           "request": {
             "method": "GET",
-            "description": "Get freelancer dashboard metrics: total clients, active projects, pending invoices, and monthly revenue for the last 6 months.",
-            "url": { "raw": "{{baseUrl}}/dashboard/freelancer/1", "host": ["{{baseUrl}}"], "path": ["dashboard", "freelancer", "1"] }
+            "description": "Returns: totalClients, activeProjects, pendingInvoices, currentMonthRevenue, last6MonthsRevenue (array ready for graph).",
+            "url": { "raw": "{{baseUrl}}/dashboard/freelancer/{{userId}}", "host": ["{{baseUrl}}"], "path": ["dashboard", "freelancer", "{{userId}}"] }
           }
         },
         {
           "name": "Get Admin Dashboard",
           "request": {
             "method": "GET",
-            "description": "Get admin dashboard metrics: freelancer stats, project stats, and platform revenue for the last 12 months.",
+            "description": "Returns: freelancer stats, project stats, totalPlatformRevenue, last 12 months monthly revenue (array ready for graph).",
             "url": { "raw": "{{baseUrl}}/dashboard/admin", "host": ["{{baseUrl}}"], "path": ["dashboard", "admin"] }
+          }
+        },
+        {
+          "name": "Get Freelancer Revenue - Specific Month",
+          "request": {
+            "method": "GET",
+            "description": "Day-by-day revenue breakdown for the given month. Returns totalRevenue + dailyRevenue array (31 entries). Perfect for a detailed monthly chart. Change year/month params as needed.",
+            "url": {
+              "raw": "{{baseUrl}}/dashboard/freelancer/{{userId}}/revenue?year=2026&month=3",
+              "host": ["{{baseUrl}}"],
+              "path": ["dashboard", "freelancer", "{{userId}}", "revenue"],
+              "query": [
+                { "key": "year", "value": "2026" },
+                { "key": "month", "value": "3" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Admin Revenue - Specific Month",
+          "request": {
+            "method": "GET",
+            "description": "Platform-wide day-by-day revenue breakdown for the given month. Returns totalRevenue + dailyRevenue array. Change year/month params as needed.",
+            "url": {
+              "raw": "{{baseUrl}}/dashboard/admin/revenue?year=2026&month=3",
+              "host": ["{{baseUrl}}"],
+              "path": ["dashboard", "admin", "revenue"],
+              "query": [
+                { "key": "year", "value": "2026" },
+                { "key": "month", "value": "3" }
+              ]
+            }
           }
         }
       ]

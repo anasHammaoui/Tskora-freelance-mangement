@@ -2,6 +2,7 @@ package com.example.Taskora.service.impl;
 
 import com.example.Taskora.dto.response.AdminDashboardResponse;
 import com.example.Taskora.dto.response.FreelancerDashboardResponse;
+import com.example.Taskora.dto.response.MonthlyRevenueDetailResponse;
 import com.example.Taskora.entity.InvoiceStatus;
 import com.example.Taskora.entity.ProjectStatus;
 import com.example.Taskora.entity.Role;
@@ -45,11 +46,11 @@ public class DashboardServiceImpl implements DashboardService {
         LocalDate now = LocalDate.now();
         LocalDate startOfMonth = now.withDayOfMonth(1);
         LocalDate endOfMonth = now.withDayOfMonth(now.lengthOfMonth());
-        BigDecimal currentMonthRevenue = invoiceRepository.sumPaidRevenueByUserAndPeriod(userId, startOfMonth, endOfMonth);
+        BigDecimal currentMonthRevenue = invoiceRepository.sumPaidRevenueByUserAndPeriod(userId, startOfMonth, endOfMonth, InvoiceStatus.PAYEE);
 
         // Last 6 months monthly revenue
         LocalDate sixMonthsAgo = now.minusMonths(5).withDayOfMonth(1);
-        List<Object[]> rawData = invoiceRepository.findMonthlyRevenueByUser(userId, sixMonthsAgo);
+        List<Object[]> rawData = invoiceRepository.findMonthlyRevenueByUser(userId, sixMonthsAgo, InvoiceStatus.PAYEE);
         List<FreelancerDashboardResponse.MonthlyRevenueEntry> monthlyRevenue = buildMonthlyRevenue(rawData, 6);
 
         FreelancerDashboardResponse response = new FreelancerDashboardResponse();
@@ -73,11 +74,11 @@ public class DashboardServiceImpl implements DashboardService {
         // Total platform revenue
         LocalDate firstDay = LocalDate.of(2000, 1, 1);
         LocalDate today = LocalDate.now();
-        BigDecimal totalPlatformRevenue = invoiceRepository.sumTotalPaidRevenueByPeriod(firstDay, today);
+        BigDecimal totalPlatformRevenue = invoiceRepository.sumTotalPaidRevenueByPeriod(firstDay, today, InvoiceStatus.PAYEE);
 
         // Monthly revenue for last 12 months
         LocalDate twelveMonthsAgo = today.minusMonths(11).withDayOfMonth(1);
-        List<Object[]> rawData = invoiceRepository.findMonthlyRevenueGlobal(twelveMonthsAgo);
+        List<Object[]> rawData = invoiceRepository.findMonthlyRevenueGlobal(twelveMonthsAgo, InvoiceStatus.PAYEE);
         List<FreelancerDashboardResponse.MonthlyRevenueEntry> monthlyRevenue = buildMonthlyRevenue(rawData, 12);
 
         AdminDashboardResponse.UserStatusBreakdown breakdown =
@@ -102,14 +103,15 @@ public class DashboardServiceImpl implements DashboardService {
      */
     private List<FreelancerDashboardResponse.MonthlyRevenueEntry> buildMonthlyRevenue(
             List<Object[]> rawData, int months) {
-        // rawData: [0] = LocalDate (issue date), [1] = BigDecimal (sum)
+        // rawData: [0] = Integer (year), [1] = Integer (month), [2] = BigDecimal (sum)
         Map<String, BigDecimal> revenueMap = rawData.stream().collect(Collectors.toMap(
                 row -> {
-                    LocalDate d = (LocalDate) row[0];
-                    return YearMonth.of(d.getYear(), d.getMonthValue())
+                    int year = ((Number) row[0]).intValue();
+                    int month = ((Number) row[1]).intValue();
+                    return YearMonth.of(year, month)
                             .format(DateTimeFormatter.ofPattern("yyyy-MM"));
                 },
-                row -> (BigDecimal) row[1],
+                row -> (BigDecimal) row[2],
                 BigDecimal::add
         ));
 
@@ -122,5 +124,41 @@ public class DashboardServiceImpl implements DashboardService {
             result.add(new FreelancerDashboardResponse.MonthlyRevenueEntry(key, revenue));
         }
         return result;
+    }
+
+    @Override
+    public MonthlyRevenueDetailResponse getFreelancerMonthlyRevenueDetail(Long userId, int year, int month) {
+        BigDecimal total = invoiceRepository.sumRevenueByUserAndMonth(userId, year, month, InvoiceStatus.PAYEE);
+        List<Object[]> rawData = invoiceRepository.findDailyRevenueByUserAndMonth(userId, year, month, InvoiceStatus.PAYEE);
+        return buildMonthlyRevenueDetail(year, month, total, rawData);
+    }
+
+    @Override
+    public MonthlyRevenueDetailResponse getAdminMonthlyRevenueDetail(int year, int month) {
+        BigDecimal total = invoiceRepository.sumRevenueByMonth(year, month, InvoiceStatus.PAYEE);
+        List<Object[]> rawData = invoiceRepository.findDailyRevenueByMonth(year, month, InvoiceStatus.PAYEE);
+        return buildMonthlyRevenueDetail(year, month, total, rawData);
+    }
+
+    /**
+     * Builds a day-by-day breakdown for the given year/month, filling 0 for days with no revenue.
+     */
+    private MonthlyRevenueDetailResponse buildMonthlyRevenueDetail(int year, int month, BigDecimal total, List<Object[]> rawData) {
+        YearMonth ym = YearMonth.of(year, month);
+        String monthKey = ym.format(DateTimeFormatter.ofPattern("yyyy-MM"));
+
+        Map<Integer, BigDecimal> dayMap = rawData.stream().collect(Collectors.toMap(
+                row -> ((Number) row[0]).intValue(),
+                row -> (BigDecimal) row[1]
+        ));
+
+        List<MonthlyRevenueDetailResponse.DailyRevenueEntry> daily = new ArrayList<>();
+        for (int day = 1; day <= ym.lengthOfMonth(); day++) {
+            String date = LocalDate.of(year, month, day).format(DateTimeFormatter.ISO_LOCAL_DATE);
+            BigDecimal revenue = dayMap.getOrDefault(day, BigDecimal.ZERO);
+            daily.add(new MonthlyRevenueDetailResponse.DailyRevenueEntry(date, revenue));
+        }
+
+        return new MonthlyRevenueDetailResponse(monthKey, total != null ? total : BigDecimal.ZERO, daily);
     }
 }
